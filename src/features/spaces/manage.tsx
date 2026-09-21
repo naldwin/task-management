@@ -72,7 +72,7 @@ export function SpaceSettingsPage() {
   const [tz, setTz] = useState<string | null>(null);
   const { register, handleSubmit, reset, formState } = useForm<{ name: string; color: string; category: 'Not Started' | 'Active' | 'Done' | 'Cancelled' }>({
     resolver: zodResolver(statusSchema),
-    defaultValues: { name: '', color: '#7dd3a8', category: 'Active' },
+    defaultValues: { name: '', color: '#5b9bff', category: 'Active' },
   });
 
   if (isLoading) return <Loading />;

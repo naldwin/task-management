@@ -1,8 +1,8 @@
-# nalds — Task Management
+# Worklogger — Task Management
 
 Simple, practical team task management with spaces, custom workflows, in-app invitations, and deterministic monthly reports.
 
-Project owner (branding): **nalds**. Display names never grant permissions — only space membership roles do.
+Project owner (branding): **Worklogger**. Display names never grant permissions — only space membership roles do.
 
 ## Stack
 
@@ -26,8 +26,8 @@ cp .env.example .env
 ```dotenv
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-public-key-here
-VITE_APP_NAME=nalds — Task Management
-VITE_APP_OWNER=nalds
+VITE_APP_NAME=Worklogger — Task Management
+VITE_APP_OWNER=Worklogger
 ```
 
 | Variable | Where to find it |

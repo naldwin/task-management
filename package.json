@@ -1,8 +1,8 @@
 {
-  "name": "nalds-task-management",
+  "name": "worklogger-task-management",
   "private": true,
   "version": "1.0.0",
-  "description": "nalds — Task Management. Simple, practical team task management with spaces, custom workflows, and monthly reports.",
+  "description": "Worklogger — Task Management. Simple, practical team task management with spaces, custom workflows, and monthly reports.",
   "type": "module",
   "scripts": {
     "dev": "vite",

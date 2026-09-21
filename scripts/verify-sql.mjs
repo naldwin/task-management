@@ -40,8 +40,8 @@ try {
 }
 
 // --- seed one user + space via the RPCs (exercises create_space atomic defaults) ---
-await db.exec(`insert into auth.users(id, email) values ('11111111-1111-1111-1111-111111111111', 'nalds@example.com');
-  insert into public.profiles(id, display_name, email) values ('11111111-1111-1111-1111-111111111111', 'nalds', 'nalds@example.com');`);
+await db.exec(`insert into auth.users(id, email) values ('11111111-1111-1111-1111-111111111111', 'worklogger@example.com');
+  insert into public.profiles(id, display_name, email) values ('11111111-1111-1111-1111-111111111111', 'worklogger', 'worklogger@example.com');`);
 
 let spaceId;
 try {

@@ -58,7 +58,12 @@ export function SpacesPage() {
 
       <div className="mt-3">
         {!data?.length ? (
-          <Empty title="No spaces" hint="Create your first space above." />
+          <>
+            <Empty title="No spaces" hint="Create your first space above." />
+            <p className="text-sm text-muted mt-3">
+              Not sure where to start? Use the ? icon at the top of the sidebar to see the core workflow.
+            </p>
+          </>
         ) : (
           <div className="card overflow-x-auto">
             <table className="w-full table-compact">

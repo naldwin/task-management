@@ -7,7 +7,16 @@ export function OverviewPage() {
 
   if (isLoading) return <Loading label="Loading overview…" />;
   if (error) return <ErrorBox message={(error as Error).message} onRetry={() => refetch()} />;
-  if (!data?.length) return <Empty title="No spaces yet" hint="Create a space to start organizing work." />;
+  if (!data?.length) return (
+    <div>
+      <h1 className="text-lg font-semibold">Overview</h1>
+      <p className="text-sm text-muted">What needs attention across your spaces.</p>
+      <div className="mt-3"><Empty title="No spaces yet" hint="Create a space to start organizing work." /></div>
+      <p className="text-sm text-muted mt-3">
+        New here? Use the ? icon at the top of the sidebar for how spaces, tasks, and reports fit together.
+      </p>
+    </div>
+  );
 
   const totals = data.reduce(
     (a, s) => ({ active: a.active + s.active, blocked: a.blocked + s.blocked, overdue: a.overdue + s.overdue, done: a.done + s.doneMonth }),

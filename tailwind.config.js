@@ -6,19 +6,19 @@ export default {
     extend: {
       colors: {
         charcoal: {
-          950: '#16181d',
-          900: '#1c1f26',
-          850: '#21252e',
-          800: '#2a2d34',
-          700: '#353945',
-          600: '#4a4f5e',
+          950: '#070c16',
+          900: '#0c1424',
+          850: '#111c31',
+          800: '#1a2740',
+          700: '#2a3a58',
+          600: '#43536f',
         },
         accent: {
-          DEFAULT: '#7dd3a8',
-          dim: '#5fb488',
-          ink: '#0f1f17',
+          DEFAULT: '#5b9bff',
+          dim: '#3f7ef0',
+          ink: '#081226',
         },
-        muted: '#9aa0ae',
+        muted: '#8f9bb3',
       },
       borderRadius: {
         sm2: '4px',

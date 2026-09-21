@@ -1,4 +1,4 @@
--- nalds — Task Management: initial schema
+-- Worklogger — Task Management: initial schema
 -- Run with: supabase db push  (or paste into Supabase SQL editor)
 
 -- extensions
@@ -46,7 +46,7 @@ create table public.statuses (
   id uuid primary key default gen_random_uuid(),
   space_id uuid not null references public.spaces(id) on delete cascade,
   name text not null check (char_length(name) between 1 and 40),
-  color text not null default '#7dd3a8',
+  color text not null default '#5b9bff',
   position integer not null default 0,
   category text not null default 'Active' check (category in ('Not Started','Active','Done','Cancelled')),
   is_default boolean not null default false,

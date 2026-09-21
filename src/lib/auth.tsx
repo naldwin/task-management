@@ -77,7 +77,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       })
       .catch(() => {
         if (!cancelled) {
-          console.warn('[nalds] Session restore timed out — check VITE_SUPABASE_URL and network.');
+          console.warn('[worklogger] Session restore timed out — check VITE_SUPABASE_URL and network.');
           setLoading(false);
         }
       });

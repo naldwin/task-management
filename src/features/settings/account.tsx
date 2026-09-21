@@ -37,7 +37,7 @@ export function AccountPage() {
           <Button onClick={() => void signOut().then(() => nav('/login'))}>Log out</Button>
         </div>
         <p className="text-xs text-muted mt-3">
-          Branding owner: <strong>nalds</strong>. Display names never grant permissions — only space membership roles do.
+          Branding owner: <strong>Worklogger</strong>. Display names never grant permissions — only space membership roles do.
         </p>
       </div>
     </div>
