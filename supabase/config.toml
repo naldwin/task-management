@@ -1,0 +1,4 @@
+-- Supabase config placeholder for `supabase` CLI.
+-- See https://supabase.com/docs/guides/cli for full reference.
+[api]
+enabled = true

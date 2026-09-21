@@ -1,0 +1,19 @@
+# deps
+node_modules/
+
+# build
+dist/
+dist-ssr/
+
+# env (real values — never commit)
+.env
+.env.local
+.env.*.local
+
+# logs / os
+*.log
+.DS_Store
+Thumbs.db
+
+# supabase
+.supabase/

@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { color-scheme: dark; }
+
+html, body, #root { height: 100%; }
+
+body {
+  @apply bg-charcoal-950 text-slate-100 font-sans antialiased;
+}
+
+a { @apply text-accent; }
+a:hover { @apply underline; }
+
+:focus-visible {
+  outline: 2px solid #7dd3a8;
+  outline-offset: 2px;
+}
+
+.table-compact th { @apply text-left text-xs font-medium uppercase tracking-wide text-muted px-2 py-1.5 border-b border-charcoal-700; }
+.table-compact td { @apply px-2 py-1.5 border-b border-charcoal-800 text-sm align-middle; }
+.table-compact tbody tr:hover { @apply bg-charcoal-850; }
+
+.input {
+  @apply w-full bg-charcoal-850 border border-charcoal-700 rounded-md2 px-2.5 py-1.5 text-sm text-slate-100 placeholder:text-muted focus:border-accent focus:outline-none;
+}
+.btn {
+  @apply inline-flex items-center justify-center gap-1.5 rounded-md2 px-3 py-1.5 text-sm font-medium border border-charcoal-600 bg-charcoal-800 text-slate-100 transition-colors hover:bg-charcoal-700 disabled:opacity-50 disabled:cursor-not-allowed no-underline;
+}
+.btn-primary {
+  @apply bg-accent text-accent-ink border-transparent hover:bg-accent-dim font-semibold;
+  color: #0f1f17 !important;
+}
+.btn-danger { @apply border-red-900 bg-red-950 text-red-200 hover:bg-red-900; }
+.btn-ghost { @apply border-transparent bg-transparent hover:bg-charcoal-800; }
+.card { @apply bg-charcoal-900 border border-charcoal-700 rounded-md2; }
+.label { @apply block text-xs font-medium text-muted mb-1; }
+.error-text { @apply text-xs text-red-300 mt-1; }
+.badge { @apply inline-flex items-center gap-1 rounded-sm2 border border-charcoal-600 px-1.5 py-0.5 text-xs; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+
+/* ------- print: report only ------- */
+@media print {
+  body { background: #fff !important; color: #111 !important; }
+  .no-print { display: none !important; }
+  .print-area { display: block !important; color: #111 !important; background: #fff !important; }
+  .print-area table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .print-area th, .print-area td {
+    border: 1px solid #999; padding: 4px 6px; text-align: left;
+    overflow-wrap: anywhere; word-break: break-word;
+  }
+  .print-area thead { display: table-header-group; }
+  .print-area tr { page-break-inside: avoid; }
+  @page { margin: 14mm; }
+}
