@@ -101,8 +101,7 @@ npm run preview  # preview dist/
 
 Every route (`/spaces/:spaceId/tasks/:taskId`, etc.) must support direct navigation, refresh, and back/forward. Serve `index.html` for unknown paths:
 
-- **Vercel:** `vercel.json` is included (`rewrites → /index.html`).
-- **Netlify:** `public/_redirects` is included (`/* /index.html 200`).
+- **Cloudflare Workers:** `wrangler.jsonc` uses `"not_found_handling": "single-page-application"`. Do not add a `_redirects` file — Cloudflare rejects it as a redirect loop.
 - **Nginx:** `try_files $uri $uri/ /index.html;`
 - **Static servers:** enable single-page-app fallback to `index.html`.
 

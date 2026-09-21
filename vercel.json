@@ -1,4 +1,0 @@
-/* All routes should serve index.html (SPA fallback) */
-{
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
-}
