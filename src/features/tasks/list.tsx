@@ -6,7 +6,9 @@ import { taskSchema, type TaskInput } from '../../lib/schemas';
 import { useMembers, useMyRole, useSpace, useStatuses } from '../spaces/hooks';
 import { useCreateTask, useTasks, useUpdateTask, type TaskFilter } from './hooks';
 import { Button, Empty, ErrorBox, Field, Input, Loading, PriorityBadge, Select, StatusDot, Textarea } from '../../components/ui';
-import { can, copyText, fmtDate } from '../../lib/utils';
+import { BoardIcon, ChevronLeftIcon, ChevronRightIcon, CloseIcon, ExternalIcon, PlusIcon, TableIcon } from '../../components/icons';
+import { CopyButton } from '../../components/copy-button';
+import { can, fmtDate, taskCopyKey } from '../../lib/utils';
 
 function useFilterFromUrl(): [TaskFilter, (patch: Partial<TaskFilter>) => void] {
   const [params, setParams] = useSearchParams();
@@ -60,10 +62,10 @@ export function SpaceTasksPage() {
           </div>
         </div>
         <div className="flex gap-2">
-          <Button variant={filter.view === 'board' ? 'default' : 'ghost'} onClick={() => setFilter({ view: filter.view === 'board' ? 'table' : 'board' })}>
+          <Button variant={filter.view === 'board' ? 'default' : 'ghost'} onClick={() => setFilter({ view: filter.view === 'board' ? 'table' : 'board' })} icon={filter.view === 'board' ? <TableIcon className="h-4 w-4" /> : <BoardIcon className="h-4 w-4" />}>
             {filter.view === 'board' ? 'Table view' : 'Board view'}
           </Button>
-          {editable && <Button variant="primary" onClick={() => setShowCreate((v) => !v)}>{showCreate ? 'Close' : 'New task'}</Button>}
+          {editable && <Button variant="primary" onClick={() => setShowCreate((v) => !v)} icon={showCreate ? <CloseIcon className="h-4 w-4" /> : <PlusIcon className="h-4 w-4" />}>{showCreate ? 'Close' : 'New task'}</Button>}
         </div>
       </div>
 
@@ -198,7 +200,7 @@ function CreateTaskForm({ spaceId, onDone }: { spaceId: string; onDone: () => vo
         <Field label="PR URL (optional)" error={formState.errors.pr_url?.message}><Input {...register('pr_url')} placeholder="https://…" /></Field>
       </div>
       {err && <p className="error-text" role="alert">{err}</p>}
-      <Button variant="primary" disabled={create.isPending}>{create.isPending ? 'Creating…' : 'Create task'}</Button>
+      <Button variant="primary" disabled={create.isPending} icon={<PlusIcon className="h-4 w-4" />}>{create.isPending ? 'Creating…' : 'Create task'}</Button>
     </form>
   );
 }
@@ -226,6 +228,7 @@ function TaskTable({ spaceId, rows, total, page, setFilter, role }: {
           {rows.map((t) => (
             <tr key={t.id}>
               <td>
+                <CopyButton text={taskCopyKey(t.key, t.title)} label={`task identifier ${taskCopyKey(t.key, t.title)}`} className="mr-1 align-middle" />
                 <span className="font-mono text-xs text-muted">{t.key}</span>{' '}
                 <Link to={`/spaces/${spaceId}/tasks/${t.id}`} className="no-underline font-medium">{t.title}</Link>
                 {t.is_blocked && <span className="badge ml-1 border-red-900 text-red-300">Blocked</span>}
@@ -268,11 +271,11 @@ function TaskTable({ spaceId, rows, total, page, setFilter, role }: {
                 {t.git_branch ? (
                   <span className="inline-flex items-center gap-1 font-mono text-xs">
                     <span className="truncate max-w-[140px]" title={t.git_branch}>{t.git_branch}</span>
-                    <button className="text-muted hover:text-white" title="Copy branch" onClick={() => copyText(t.git_branch!)}>⧉</button>
+                    <CopyButton text={t.git_branch} label={`branch ${t.git_branch}`} />
                   </span>
                 ) : <span className="text-muted">—</span>}
               </td>
-              <td>{t.pr_url ? <a href={t.pr_url} target="_blank" rel="noreferrer" className="text-xs no-underline">Open ↗</a> : <span className="text-muted">—</span>}</td>
+              <td>{t.pr_url ? <a href={t.pr_url} target="_blank" rel="noreferrer" className="text-xs no-underline inline-flex items-center gap-1">Open <ExternalIcon className="h-3.5 w-3.5" /></a> : <span className="text-muted">—</span>}</td>
               <td className="text-muted whitespace-nowrap text-xs">{fmtDate(t.updated_at)}</td>
             </tr>
           ))}
@@ -281,8 +284,8 @@ function TaskTable({ spaceId, rows, total, page, setFilter, role }: {
       <div className="flex items-center justify-between p-2 text-xs text-muted">
         <span>{total} task{total === 1 ? '' : 's'} · page {page} of {pages}</span>
         <span>
-          <Button disabled={page <= 1} onClick={() => setFilter({ page: page - 1 })} className="mr-1">Prev</Button>
-          <Button disabled={page >= pages} onClick={() => setFilter({ page: page + 1 })}>Next</Button>
+          <Button disabled={page <= 1} onClick={() => setFilter({ page: page - 1 })} className="mr-1" icon={<ChevronLeftIcon className="h-4 w-4" />}>Prev</Button>
+          <Button disabled={page >= pages} onClick={() => setFilter({ page: page + 1 })} icon={<ChevronRightIcon className="h-4 w-4" />}>Next</Button>
         </span>
       </div>
     </div>

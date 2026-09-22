@@ -1,12 +1,20 @@
 import { forwardRef, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes } from 'react';
+import { RefreshIcon } from './icons';
 
 export function Button({
   variant = 'default',
   className = '',
+  icon,
+  children,
   ...rest
-}: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: 'default' | 'primary' | 'danger' | 'ghost' }) {
+}: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: 'default' | 'primary' | 'danger' | 'ghost'; icon?: ReactNode }) {
   const v = variant === 'primary' ? 'btn btn-primary' : variant === 'danger' ? 'btn btn-danger' : variant === 'ghost' ? 'btn btn-ghost' : 'btn';
-  return <button className={`${v} ${className}`} {...rest} />;
+  return (
+    <button className={`${v} ${className}`} {...rest}>
+      {icon && <span aria-hidden className="inline-flex shrink-0">{icon}</span>}
+      {children}
+    </button>
+  );
 }
 
 export const Input = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputElement>>(function Input(props, ref) {
@@ -48,7 +56,7 @@ export function ErrorBox({ message, onRetry }: { message: string; onRetry?: () =
   return (
     <div className="card p-4 border-red-900" role="alert">
       <p className="text-sm text-red-200">{message}</p>
-      {onRetry && <button className="btn mt-2" onClick={onRetry}>Retry</button>}
+      {onRetry && <button className="btn mt-2" onClick={onRetry}><span aria-hidden className="inline-flex shrink-0"><RefreshIcon className="h-4 w-4" /></span>Retry</button>}
     </div>
   );
 }

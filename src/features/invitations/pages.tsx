@@ -6,6 +6,7 @@ import { useMembers, useMyRole } from '../spaces/hooks';
 import { useRevokeInvitation, useInviteUser, useSpaceInvitations } from './hooks';
 import { useAuth } from '../../lib/auth';
 import { Button, Empty, ErrorBox, Field, Input, Loading, Select } from '../../components/ui';
+import { CheckIcon, CloseIcon, SendIcon, TrashIcon } from '../../components/icons';
 import { can } from '../../lib/utils';
 
 export function InvitationsPage() {
@@ -53,12 +54,14 @@ export function InvitationList({ rows }: { rows: import('../../lib/database.type
                 <Button
                   variant="primary" className="mr-2"
                   disabled={respond.isPending}
+                  icon={<CheckIcon className="h-4 w-4" />}
                   onClick={() => respond.mutateAsync({ id: r.id, accept: true }).catch((e) => setErr((e as Error).message))}
                 >
                   Accept
                 </Button>
                 <Button
                   disabled={respond.isPending}
+                  icon={<CloseIcon className="h-4 w-4" />}
                   onClick={() => respond.mutateAsync({ id: r.id, accept: false }).catch((e) => setErr((e as Error).message))}
                 >
                   Decline
@@ -115,7 +118,7 @@ export function SpaceInvitePanel({ spaceId }: { spaceId: string }) {
           </Field>
         </div>
         <div className="flex items-end pb-3">
-          <Button variant="primary" disabled={invite.isPending}>{invite.isPending ? 'Inviting…' : 'Invite'}</Button>
+          <Button variant="primary" disabled={invite.isPending} icon={<SendIcon className="h-4 w-4" />}>{invite.isPending ? 'Inviting…' : 'Invite'}</Button>
         </div>
       </form>
       {serverError && <p className="error-text" role="alert">{serverError}</p>}
@@ -132,7 +135,7 @@ export function SpaceInvitePanel({ spaceId }: { spaceId: string }) {
               <tr key={p.id}>
                 <td>{p.email}</td><td>{p.role}</td>
                 <td className="text-muted">{new Date(p.created_at).toLocaleDateString()}</td>
-                <td><Button disabled={revoke.isPending} onClick={() => revoke.mutate(p.id)}>Revoke</Button></td>
+                <td><Button disabled={revoke.isPending} icon={<TrashIcon className="h-4 w-4" />} onClick={() => revoke.mutate(p.id)}>Revoke</Button></td>
               </tr>
             ))}
           </tbody>

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../lib/auth';
 import { supabase } from '../../lib/supabase';
 import { Button, Field, Input } from '../../components/ui';
+import { LogoutIcon, SaveIcon } from '../../components/icons';
 
 export function AccountPage() {
   const { user, profile, signOut, refreshProfile } = useAuth();
@@ -24,6 +25,7 @@ export function AccountPage() {
         <div className="flex gap-2 mt-1">
           <Button
             variant="primary"
+            icon={<SaveIcon className="h-4 w-4" />}
             onClick={async () => {
               setErr(null); setMsg(null);
               if (!user) return;
@@ -34,11 +36,8 @@ export function AccountPage() {
           >
             Save
           </Button>
-          <Button onClick={() => void signOut().then(() => nav('/login'))}>Log out</Button>
+          <Button onClick={() => void signOut().then(() => nav('/login'))} icon={<LogoutIcon className="h-4 w-4" />}>Log out</Button>
         </div>
-        <p className="text-xs text-muted mt-3">
-          Branding owner: <strong>Worklogger</strong>. Display names never grant permissions — only space membership roles do.
-        </p>
       </div>
     </div>
   );

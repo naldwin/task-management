@@ -10,6 +10,7 @@ import {
 } from "../../lib/schemas";
 import { useAuth } from "../../lib/auth";
 import { Button, Field, Input } from "../../components/ui";
+import { CheckIcon, LogoutIcon, SendIcon } from "../../components/icons";
 import { WorkloggerLogo } from "../../components/brand";
 
 const PasswordInput = forwardRef<
@@ -120,6 +121,7 @@ export function LoginPage() {
             variant="primary"
             className="w-full mt-2"
             disabled={formState.isSubmitting}
+            icon={<LogoutIcon className="h-4 w-4" />}
           >
             {formState.isSubmitting ? "Logging in…" : "Log in"}
           </Button>
@@ -183,6 +185,7 @@ export function RegisterPage() {
           )}
           <div className="flex gap-2 mt-3">
             <Button
+              icon={<SendIcon className="h-4 w-4" />}
               onClick={async () => {
                 setResendMsg(null);
                 const { error } = await resendConfirmation(pendingEmail);
@@ -194,7 +197,7 @@ export function RegisterPage() {
             >
               Resend email
             </Button>
-            <Button variant="primary" onClick={() => nav("/login")}>
+            <Button variant="primary" onClick={() => nav("/login")} icon={<CheckIcon className="h-4 w-4" />}>
               Go to log in
             </Button>
           </div>
@@ -255,6 +258,7 @@ export function RegisterPage() {
             variant="primary"
             className="w-full mt-2"
             disabled={formState.isSubmitting}
+            icon={<CheckIcon className="h-4 w-4" />}
           >
             {formState.isSubmitting ? "Creating…" : "Register"}
           </Button>

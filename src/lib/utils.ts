@@ -53,6 +53,15 @@ export function copyText(t: string): Promise<void> {
   return Promise.reject(new Error('clipboard unavailable'));
 }
 
+/** Copy-ready task identifier: `KEY-slugified-title` (e.g. `HC-001-create-a-task`). */
+export function taskCopyKey(key: string, title: string): string {
+  const slug = (title ?? '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+  return slug ? `${key}-${slug}` : key;
+}
+
 /**
  * Race a promise against a timeout so UI actions can never spin forever
  * (e.g. Supabase unreachable, wrong VITE_SUPABASE_URL, ad-blocker).

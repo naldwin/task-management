@@ -5,6 +5,7 @@ import { usePendingInvitationCount } from '../features/invitations/hooks';
 import { useSpaces } from '../features/spaces/hooks';
 import { SystemOverviewContent } from '../features/system/page';
 import { WorkloggerLogo } from './brand';
+import { CloseIcon, LogoutIcon } from './icons';
 
 const linkCls = ({ isActive }: { isActive: boolean }) =>
   `block rounded-md2 px-2.5 py-1.5 text-sm no-underline transition-colors ${
@@ -61,6 +62,7 @@ function HelpDialog({ onClose }: { onClose: () => void }) {
             autoFocus
             className="btn"
           >
+            <span aria-hidden className="inline-flex shrink-0"><CloseIcon className="h-4 w-4" /></span>
             Close
           </button>
         </div>
@@ -77,13 +79,14 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   const nav = useNavigate();
   const [open, setOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
+  const activeSpaceCount = spaces?.filter((s) => !s.is_archived).length ?? 0;
 
   const links = (
     <nav className="flex flex-col gap-0.5 p-2" aria-label="Primary">
       <NavLink to="/overview" className={linkCls} onClick={onNavigate}>Overview</NavLink>
       <NavLink to="/my-tasks" className={linkCls} onClick={onNavigate}>My Tasks</NavLink>
       <NavLink to="/spaces" className={linkCls} onClick={onNavigate}>
-        Spaces{spaces?.length ? ` (${spaces.length})` : ''}
+        Spaces{activeSpaceCount ? ` (${activeSpaceCount})` : ''}
       </NavLink>
       <NavLink to="/invitations" className={linkCls} onClick={onNavigate}>
         Invitations{inviteCount ? ` (${inviteCount})` : ''}
@@ -91,6 +94,9 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
       <NavLink to="/account" className={linkCls} onClick={onNavigate}>Account</NavLink>
     </nav>
   );
+
+  const displayName = profile?.display_name ?? 'Member';
+  const email = profile?.email ?? '';
 
   return (
     <>
@@ -107,21 +113,27 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
       {open && <div className="no-print md:hidden border-b border-charcoal-700 bg-charcoal-900">{links}</div>}
 
       {/* desktop sidebar */}
-      <aside className="no-print hidden md:flex w-56 shrink-0 flex-col border-r border-charcoal-700 bg-charcoal-900">
-        <div className="px-3 py-3 border-b border-charcoal-700">
+      <aside className="no-print hidden md:flex w-56 shrink-0 self-start flex-col border-r border-charcoal-700 bg-charcoal-900 md:sticky md:top-0 md:h-dvh">
+        <div className="px-3 py-3 border-b border-charcoal-700 shrink-0">
           <div className="flex items-center justify-between gap-2 -mt-3">
             <WorkloggerLogo className="h-12 w-auto" />
             <HelpButton onClick={() => setHelpOpen(true)} />
           </div>
-          {profile && <p className="text-xs text-muted mt-1 truncate" title={profile.email}>{profile.display_name}</p>}
         </div>
-        <div className="flex-1 overflow-y-auto">{links}</div>
-        <div className="p-2 border-t border-charcoal-700">
+        <div className="flex-1 min-h-0 overflow-y-auto">{links}</div>
+        <div className="py-2 pl-4 pr-2 border-t border-charcoal-700 flex items-center gap-2 shrink-0 bg-charcoal-900">
+          <span className="flex-1 min-w-0 leading-tight">
+            <span className="block truncate text-sm font-medium text-slate-100" title={email || displayName}>{displayName}</span>
+            {email && <span className="block truncate text-xs text-muted" title={email}>{email}</span>}
+          </span>
           <button
-            className="btn w-full"
+            type="button"
+            title="Log out"
+            aria-label="Log out"
+            className="btn btn-ghost !px-2 shrink-0 text-muted hover:text-white"
             onClick={() => { void signOut().then(() => nav('/login')); }}
           >
-            Log out
+            <span aria-hidden className="inline-flex shrink-0"><LogoutIcon className="h-4 w-4" /></span>
           </button>
         </div>
       </aside>
@@ -133,7 +145,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
 export function AppShell({ children }: { children: React.ReactNode }) {
   const [mobileNav, setMobileNav] = useState(false);
   return (
-    <div className="min-h-full md:flex">
+    <div className="min-h-dvh md:flex md:items-start">
       <Sidebar onNavigate={() => setMobileNav(false)} />
       <main className="flex-1 min-w-0">
         <div className="mx-auto max-w-6xl px-3 py-4 md:px-6" data-mobile-nav={mobileNav}>

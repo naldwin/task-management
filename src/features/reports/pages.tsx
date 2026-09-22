@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useMyRole, useSpace } from '../spaces/hooks';
 import { useGenerateReport, useReport, useReports } from './hooks';
 import { Button, Empty, ErrorBox, Loading } from '../../components/ui';
+import { PrintIcon, RefreshIcon } from '../../components/icons';
 import { can } from '../../lib/utils';
 
 function monthOptions(n = 12): string[] {
@@ -54,6 +55,7 @@ export function SpaceReportsPage() {
           <Button
             variant="primary"
             disabled={gen.isPending}
+            icon={<RefreshIcon className="h-4 w-4" />}
             onClick={() => {
               setErr(null); setOkMsg(null);
               gen.mutateAsync(month)
@@ -121,9 +123,9 @@ export function SpaceReportDetailPage() {
           {report && <span className="badge">Snapshot</span>}
         </div>
         <div className="flex gap-2 mt-2 flex-wrap items-center">
-          {report && <Button variant="primary" onClick={() => window.print()}>Print / Save as PDF</Button>}
+          {report && <Button variant="primary" onClick={() => window.print()} icon={<PrintIcon className="h-4 w-4" />}>Print / Save as PDF</Button>}
           {can('manage-report', role) ? (
-            <Button variant={report ? 'default' : 'primary'} disabled={gen.isPending} onClick={() => gen.mutateAsync(month!).then(() => refetch()).catch((e) => setErr((e as Error).message))}>
+            <Button variant={report ? 'default' : 'primary'} disabled={gen.isPending} icon={<RefreshIcon className="h-4 w-4" />} onClick={() => gen.mutateAsync(month!).then(() => refetch()).catch((e) => setErr((e as Error).message))}>
               {gen.isPending ? 'Gathering…' : report ? 'Regenerate' : 'Generate report'}
             </Button>
           ) : (

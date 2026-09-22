@@ -6,6 +6,7 @@ import { statusSchema } from '../../lib/schemas';
 import { useMembers, useMyRole, useSpace, useStatuses, useCreateStatus, useUpdateStatus, useRetireStatus, useChangeRole, useRemoveMember, useUpdateSpace } from './hooks';
 import { SpaceInvitePanel } from '../invitations/pages';
 import { Button, Empty, ErrorBox, Field, Input, Loading, Select, StatusDot } from '../../components/ui';
+import { ArchiveIcon, CheckIcon, ChevronUpIcon, CloseIcon, PlusIcon, SaveIcon, SendIcon, TrashIcon } from '../../components/icons';
 import { can } from '../../lib/utils';
 
 export function SpaceMembersPage() {
@@ -44,7 +45,7 @@ export function SpaceMembersPage() {
                   ) : m.role}
                 </td>
                 {role === 'owner' && (
-                  <td><Button disabled={remove.isPending} onClick={() => remove.mutateAsync({ space_id: spaceId!, user_id: m.user_id }).catch((ex) => setErr((ex as Error).message))}>Remove</Button></td>
+                  <td><Button disabled={remove.isPending} icon={<TrashIcon className="h-4 w-4" />} onClick={() => remove.mutateAsync({ space_id: spaceId!, user_id: m.user_id }).catch((ex) => setErr((ex as Error).message))}>Remove</Button></td>
                 )}
               </tr>
             ))}
@@ -110,9 +111,10 @@ export function SpaceSettingsPage() {
         <p className="text-xs text-muted mt-1">Prefix <span className="font-mono">{space.prefix}</span> cannot be changed (task keys must stay stable).</p>
         {isOwner && (
           <div className="mt-2 flex gap-2">
-            <Button variant="primary" onClick={saveSpace}>Save</Button>
+            <Button variant="primary" onClick={saveSpace} icon={<SaveIcon className="h-4 w-4" />}>Save</Button>
             <Button
               variant={space.is_archived ? 'default' : 'danger'}
+              icon={<ArchiveIcon className="h-4 w-4" />}
               onClick={() => updateSpace.mutateAsync({ id: space.id, is_archived: !space.is_archived }).then(() => setMsg(space.is_archived ? 'Unarchived.' : 'Archived.')).catch((e) => setErr((e as Error).message))}
             >
               {space.is_archived ? 'Unarchive space' : 'Archive space'}
@@ -137,11 +139,13 @@ export function SpaceSettingsPage() {
                   {canStatus && (
                     <td className="whitespace-nowrap">
                       <Button
-                        className="mr-1" title="Move up"
+                        className="mr-1" title="Move up" aria-label="Move up"
+                        icon={<ChevronUpIcon className="h-4 w-4" />}
                         onClick={() => updateStatus.mutateAsync({ id: s.id, space_id: space.id, position: Math.max(0, s.position - 1) }).catch((e) => setErr((e as Error).message))}
-                      >↑</Button>
+                      >Up</Button>
                       <Button
                         className="mr-1" title="Set as default start"
+                        icon={<CheckIcon className="h-4 w-4" />}
                         onClick={() => updateStatus.mutateAsync({ id: s.id, space_id: space.id, is_default: true }).catch((e) => setErr((e as Error).message))}
                       >Default</Button>
                       <RetireButton statusId={s.id} spaceId={space.id} others={(statuses ?? []).filter((o) => o.id !== s.id)} />
@@ -170,7 +174,7 @@ export function SpaceSettingsPage() {
                 {['Not Started', 'Active', 'Done', 'Cancelled'].map((c) => <option key={c} value={c}>{c}</option>)}
               </Select>
             </div>
-            <Button variant="primary">Add status</Button>
+            <Button variant="primary" icon={<PlusIcon className="h-4 w-4" />}>Add status</Button>
             {formState.errors.name && <p className="error-text w-full">{formState.errors.name.message}</p>}
           </form>
         )}
@@ -184,7 +188,7 @@ function RetireButton({ statusId, spaceId, others }: { statusId: string; spaceId
   const [pick, setPick] = useState('');
   const [confirming, setConfirming] = useState(false);
   const [err, setErr] = useState<string | null>(null);
-  if (!confirming) return <Button onClick={() => setConfirming(true)}>Retire…</Button>;
+  if (!confirming) return <Button onClick={() => setConfirming(true)} icon={<ArchiveIcon className="h-4 w-4" />}>Retire…</Button>;
   return (
     <span className="inline-flex items-center gap-1">
       <Select value={pick} onChange={(e) => setPick(e.target.value)} aria-label="Replacement status">
@@ -194,9 +198,10 @@ function RetireButton({ statusId, spaceId, others }: { statusId: string; spaceId
       <Button
         variant="danger"
         disabled={!pick || retire.isPending}
+        icon={<SendIcon className="h-4 w-4" />}
         onClick={() => retire.mutateAsync({ status_id: statusId, replacement_id: pick }).then(() => setConfirming(false)).catch((e) => setErr((e as Error).message))}
       >Migrate</Button>
-      <Button variant="ghost" onClick={() => setConfirming(false)}>Cancel</Button>
+      <Button variant="ghost" onClick={() => setConfirming(false)} icon={<CloseIcon className="h-4 w-4" />}>Cancel</Button>
       {err && <span className="error-text">{err}</span>}
       <span className="hidden">{spaceId}</span>
     </span>
