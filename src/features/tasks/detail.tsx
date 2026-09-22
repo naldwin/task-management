@@ -30,6 +30,7 @@ import {
 } from "../../components/icons";
 import { CopyButton } from "../../components/copy-button";
 import { can, fmtDateTime, taskCopyKey } from "../../lib/utils";
+import { detailActivity, labelActivity } from "../../lib/activity-label";
 import { useAuth } from "../../lib/auth";
 
 export function TaskDetailPage() {
@@ -506,13 +507,13 @@ function ActivityPanel({ taskId }: { taskId: string }) {
               key={a.id}
               className="text-xs border-t border-charcoal-800 pt-1.5"
             >
-              <p className="font-medium">{label(a)}</p>
+              <p className="font-medium">{labelActivity(a)}</p>
               <p className="text-muted">
                 {a.actor?.display_name ?? "System"} ·{" "}
                 {fmtDateTime(a.created_at)}
               </p>
-              {detail(a) && (
-                <p className="text-muted mt-0.5 break-words">{detail(a)}</p>
+              {detailActivity(a) && (
+                <p className="text-muted mt-0.5 break-words">{detailActivity(a)}</p>
               )}
             </li>
           ))}
@@ -522,50 +523,3 @@ function ActivityPanel({ taskId }: { taskId: string }) {
   );
 }
 
-function label(a: import("../../lib/database.types").TaskActivity): string {
-  switch (a.action) {
-    case "created":
-      return "Created";
-    case "status_changed":
-      return "Status changed";
-    case "completed":
-      return "Completed";
-    case "reopened":
-      return "Reopened (completion cleared, history preserved)";
-    case "blocked":
-      return "Marked blocked";
-    case "unblocked":
-      return "Unblocked";
-    case "archived":
-      return "Archived";
-    case "unarchived":
-      return "Unarchived";
-    default:
-      return a.field_name ? `Updated ${a.field_name}` : a.action;
-  }
-}
-
-function detail(a: import("../../lib/database.types").TaskActivity): string {
-  try {
-    const o = a.old_value as { label?: string } | null;
-    const n = a.new_value as { label?: string } | null;
-    if (
-      o &&
-      typeof o === "object" &&
-      n &&
-      typeof n === "object" &&
-      ("label" in o || "label" in n)
-    ) {
-      return `${(o as { label?: string }).label ?? JSON.stringify(o)} → ${(n as { label?: string }).label ?? JSON.stringify(n)}`;
-    }
-    if (a.old_value != null || a.new_value != null) {
-      const s = (v: unknown) => (typeof v === "string" ? v : JSON.stringify(v));
-      if (a.old_value != null && a.new_value != null)
-        return `${s(a.old_value)} → ${s(a.new_value)}`;
-      return s(a.new_value ?? a.old_value);
-    }
-  } catch {
-    /* ignore */
-  }
-  return "";
-}

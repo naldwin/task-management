@@ -123,6 +123,7 @@ export function SystemOverviewContent({ onNavigate }: { onNavigate?: () => void 
           <li><Link to="/spaces" className="no-underline font-medium" onClick={onNavigate}>Create your first space</Link> <span className="text-muted">— name, prefix, timezone.</span></li>
           <li><Link to="/profile#invitations" className="no-underline font-medium" onClick={onNavigate}>Check invitations</Link> <span className="text-muted">— accept a space someone shared with this email.</span></li>
           <li><Link to="/my-tasks" className="no-underline font-medium" onClick={onNavigate}>Open My Tasks</Link> <span className="text-muted">— work assigned to you across spaces.</span></li>
+          <li><Link to="/activity" className="no-underline font-medium" onClick={onNavigate}>Follow Activity</Link> <span className="text-muted">— updates and key events across your spaces.</span></li>
           <li><Link to="/profile" className="no-underline font-medium" onClick={onNavigate}>Review your profile</Link> <span className="text-muted">— display name shown to teammates.</span></li>
         </ul>
       </section>

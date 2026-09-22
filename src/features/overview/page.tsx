@@ -1,9 +1,12 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useOverview } from '../tasks/hooks';
+import { useActivityFeed } from '../activity/hooks';
+import { FeedItemRow } from '../activity/feed';
 import { usePendingInvitationCount } from '../invitations/hooks';
 import { Empty, ErrorBox, Loading, PriorityBadge, StatusDot } from '../../components/ui';
 import { fmtDate } from '../../lib/utils';
+import { mergeFeed } from '../../lib/feed-selectors';
 import {
   computeKpis,
   countByPriority,
@@ -74,6 +77,12 @@ export function OverviewPage() {
   const recent = useMemo(
     () => tasks.filter((t) => t.assignee_id === uid).sort((a, b) => (b.updated_at ?? '').localeCompare(a.updated_at ?? '')).slice(0, 5),
     [tasks, uid],
+  );
+  const feedSpaceIds = useMemo(() => spaces.map((s) => s.id), [spaces]);
+  const { data: feed } = useActivityFeed(feedSpaceIds, undefined, 10);
+  const feedItems = useMemo(
+    () => (feed ? mergeFeed(feed.comments, feed.events).slice(0, 7) : []),
+    [feed],
   );
 
   const defaultExpanded = spaces.length <= 4;
@@ -274,21 +283,33 @@ export function OverviewPage() {
         </div>
       </div>
 
-      {!!recent.length && (
+      {(!!feedItems.length || !!recent.length) && (
         <div className="card mt-2 p-3">
           <div className="flex items-baseline justify-between gap-2">
-            <h2 className="text-sm font-semibold">Recently updated · assigned to you</h2>
-            <Link to="/my-tasks" className="text-xs no-underline">My tasks →</Link>
+            <h2 className="text-sm font-semibold">Recent activity</h2>
+            <Link to="/activity" className="text-xs no-underline">View all activity →</Link>
           </div>
-          <ul className="mt-2 flex flex-col gap-1.5">
-            {recent.map((t) => (
-              <li key={t.id} className="text-sm flex items-baseline gap-2 min-w-0">
-                <span className="font-mono text-xs text-muted shrink-0">{t.key}</span>
-                <Link to={`/spaces/${t.space_id}/tasks/${t.id}`} className="no-underline truncate">{t.title}</Link>
-                <span className="text-xs text-muted shrink-0 ml-auto">{fmtDate(t.updated_at)}</span>
-              </li>
-            ))}
-          </ul>
+          {!!feedItems.length ? (
+            <ul className="mt-2 flex flex-col gap-2">
+              {feedItems.map((i) => (
+                <FeedItemRow
+                  key={`${i.kind}-${i.kind === 'comment' ? i.comment.id : i.event.id}`}
+                  item={i}
+                  spaceName={spaceById[i.kind === 'comment' ? i.comment.space_id : i.event.space_id]?.name ?? ''}
+                />
+              ))}
+            </ul>
+          ) : (
+            <ul className="mt-2 flex flex-col gap-1.5">
+              {recent.map((t) => (
+                <li key={t.id} className="text-sm flex items-baseline gap-2 min-w-0">
+                  <span className="font-mono text-xs text-muted shrink-0">{t.key}</span>
+                  <Link to={`/spaces/${t.space_id}/tasks/${t.id}`} className="no-underline truncate">{t.title}</Link>
+                  <span className="text-xs text-muted shrink-0 ml-auto">{fmtDate(t.updated_at)}</span>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       )}
     </div>

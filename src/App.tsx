@@ -6,6 +6,7 @@ import { LoginPage, RegisterPage } from './features/auth/pages';
 import { OverviewPage } from './features/overview/page';
 import { MyTasksPage } from './features/mytasks/page';
 import { SpacesPage } from './features/spaces/pages';
+import { ActivityPage } from './features/activity/page';
 import { SpaceTasksPage } from './features/tasks/list';
 import { TaskDetailPage } from './features/tasks/detail';
 import { SpaceMembersPage, SpaceSettingsPage } from './features/spaces/manage';
@@ -44,6 +45,7 @@ export default function App() {
         <Route path="/my-tasks" element={<MyTasksPage />} />
         <Route path="/profile" element={<AccountPage />} />
         <Route path="/spaces" element={<SpacesPage />} />
+        <Route path="/activity" element={<ActivityPage />} />
         <Route path="/spaces/:spaceId/tasks" element={<SpaceTasksPage />} />
         <Route path="/spaces/:spaceId/tasks/:taskId" element={<TaskDetailPage />} />
         <Route path="/spaces/:spaceId/members" element={<SpaceMembersPage />} />

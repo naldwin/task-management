@@ -17,6 +17,18 @@ export interface TaskFilter {
 
 const PAGE_SIZE = 20;
 
+/** PostgREST caps single responses at 1000 rows — page through to avoid silent truncation. */
+async function fetchAllPages<T>(fetchPage: (from: number, to: number) => Promise<T[]>): Promise<T[]> {
+  const out: T[] = [];
+  const chunk = 1000;
+  for (let from = 0; ; from += chunk) {
+    const rows = await fetchPage(from, from + chunk - 1);
+    out.push(...rows);
+    if (rows.length < chunk) break;
+  }
+  return out;
+}
+
 export function useTasks(spaceId: string | undefined, f: TaskFilter) {
   return useQuery({
     queryKey: ['tasks', spaceId, f],
@@ -198,15 +210,19 @@ export function useMyTasks() {
       const { data: sess } = await supabase.auth.getSession();
       const uid = sess.session?.user.id;
       if (!uid) return [];
-      const { data, error } = await supabase
-        .from('tasks')
-        .select('*, status:statuses!tasks_status_id_fkey(*), assignee:profiles!tasks_assignee_id_fkey(*)')
-        .eq('assignee_id', uid)
-        .is('archived_at', null)
-        .order('updated_at', { ascending: false })
-        .limit(200);
-      if (error) throw error;
-      return (data ?? []) as unknown as Task[];
+      const rows = await fetchAllPages(async (from, to) => {
+        const { data, error } = await supabase
+          .from('tasks')
+          .select('*, status:statuses!tasks_status_id_fkey(*), assignee:profiles!tasks_assignee_id_fkey(*)')
+          .eq('assignee_id', uid)
+          .is('archived_at', null)
+          .order('updated_at', { ascending: false })
+          .order('id')
+          .range(from, to);
+        if (error) throw error;
+        return (data ?? []) as unknown as Task[];
+      });
+      return rows;
     },
   });
 }
@@ -258,22 +274,26 @@ export function useOverview() {
       const memRows = (mems ?? []) as unknown as Array<{ role: string; spaces: { id: string; name: string; prefix: string } }>;
       const spaces = memRows.map((m) => ({ ...m.spaces, role: m.role }));
       if (!spaces.length) return { uid, spaces: [], tasks: [] };
-      // Single batched fetch across all my spaces (replaces N+1 per-space loop).
+      // Single batched fetch across all my spaces (replaces N+1 per-space loop),
+      // paged so counts stay correct past 1000 tasks.
       const spaceIds = spaces.map((s) => s.id);
-      const { data: tasksData, error: tErr } = await supabase
-        .from('tasks')
-        .select('id,space_id,key,title,priority,due_date,is_blocked,blocker_reason,assignee_id,completed_at,updated_at,status:statuses!tasks_status_id_fkey(category,name,color)')
-        .in('space_id', spaceIds)
-        .is('archived_at', null)
-        .order('updated_at', { ascending: false })
-        .limit(1000);
-      if (tErr) throw tErr;
-      const raw = (tasksData ?? []) as unknown as Array<{
-        id: string; space_id: string; key: string; title: string; priority: string;
-        due_date: string | null; is_blocked: boolean; blocker_reason: string | null;
-        assignee_id: string | null; completed_at: string | null; updated_at: string;
-        status: { category: string; name: string; color: string } | Array<{ category: string; name: string; color: string }> | null;
-      }>;
+      const raw = await fetchAllPages(async (from, to) => {
+        const { data: tasksData, error: tErr } = await supabase
+          .from('tasks')
+          .select('id,space_id,key,title,priority,due_date,is_blocked,blocker_reason,assignee_id,completed_at,updated_at,status:statuses!tasks_status_id_fkey(category,name,color)')
+          .in('space_id', spaceIds)
+          .is('archived_at', null)
+          .order('updated_at', { ascending: false })
+          .order('id')
+          .range(from, to);
+        if (tErr) throw tErr;
+        return (tasksData ?? []) as unknown as Array<{
+          id: string; space_id: string; key: string; title: string; priority: string;
+          due_date: string | null; is_blocked: boolean; blocker_reason: string | null;
+          assignee_id: string | null; completed_at: string | null; updated_at: string;
+          status: { category: string; name: string; color: string } | Array<{ category: string; name: string; color: string }> | null;
+        }>;
+      });
       const tasks: OverviewTaskRow[] = raw.map((t) => ({
         ...t,
         status: Array.isArray(t.status) ? (t.status[0] ?? null) : t.status,
