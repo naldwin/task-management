@@ -211,35 +211,92 @@ export function useMyTasks() {
   });
 }
 
+export interface OverviewSpaceRow {
+  id: string;
+  name: string;
+  prefix: string;
+  role: string;
+  active: number;
+  blocked: number;
+  overdue: number;
+  doneMonth: number;
+  mine: number;
+  dueSoon: number;
+  unassigned: number;
+}
+
+export interface OverviewTaskRow {
+  id: string;
+  space_id: string;
+  key: string;
+  title: string;
+  priority: string;
+  due_date: string | null;
+  is_blocked: boolean;
+  blocker_reason: string | null;
+  assignee_id: string | null;
+  completed_at: string | null;
+  updated_at: string;
+  status: { category: string; name: string; color: string } | null;
+}
+
+export interface OverviewData {
+  uid: string;
+  spaces: OverviewSpaceRow[];
+  tasks: OverviewTaskRow[];
+}
+
 export function useOverview() {
   return useQuery({
     queryKey: ['overview'],
-    queryFn: async () => {
+    queryFn: async (): Promise<OverviewData> => {
       const { data: sess } = await supabase.auth.getSession();
       const uid = sess.session?.user.id;
-      if (!uid) return [];
+      if (!uid) return { uid: '', spaces: [], tasks: [] };
       const { data: mems, error: mErr } = await supabase.from('memberships').select('role, spaces(*)').eq('user_id', uid).eq('is_active', true);
       if (mErr) throw mErr;
       const memRows = (mems ?? []) as unknown as Array<{ role: string; spaces: { id: string; name: string; prefix: string } }>;
       const spaces = memRows.map((m) => ({ ...m.spaces, role: m.role }));
-      const out: Array<{ id: string; name: string; prefix: string; role: string; active: number; blocked: number; overdue: number; doneMonth: number }> = [];
+      if (!spaces.length) return { uid, spaces: [], tasks: [] };
+      // Single batched fetch across all my spaces (replaces N+1 per-space loop).
+      const spaceIds = spaces.map((s) => s.id);
+      const { data: tasksData, error: tErr } = await supabase
+        .from('tasks')
+        .select('id,space_id,key,title,priority,due_date,is_blocked,blocker_reason,assignee_id,completed_at,updated_at,status:statuses!tasks_status_id_fkey(category,name,color)')
+        .in('space_id', spaceIds)
+        .is('archived_at', null)
+        .order('updated_at', { ascending: false })
+        .limit(1000);
+      if (tErr) throw tErr;
+      const raw = (tasksData ?? []) as unknown as Array<{
+        id: string; space_id: string; key: string; title: string; priority: string;
+        due_date: string | null; is_blocked: boolean; blocker_reason: string | null;
+        assignee_id: string | null; completed_at: string | null; updated_at: string;
+        status: { category: string; name: string; color: string } | Array<{ category: string; name: string; color: string }> | null;
+      }>;
+      const tasks: OverviewTaskRow[] = raw.map((t) => ({
+        ...t,
+        status: Array.isArray(t.status) ? (t.status[0] ?? null) : t.status,
+      }));
       const start = new Date(); start.setDate(1); start.setHours(0, 0, 0, 0);
-      for (const s of spaces) {
-        const { data: tasks } = await supabase
-          .from('tasks')
-          .select('id,is_blocked,due_date,completed_at,status:statuses!tasks_status_id_fkey(category)')
-          .eq('space_id', s.id)
-          .is('archived_at', null);
-        const raw = (tasks ?? []) as unknown as Array<{ is_blocked: boolean; due_date: string | null; completed_at: string | null; status: { category: string } | Array<{ category: string }> }>;
-        const rows = raw.map((t) => ({ ...t, status: Array.isArray(t.status) ? t.status[0] : t.status }));
-        const today = new Date(); today.setHours(0, 0, 0, 0);
+      const today = new Date(); today.setHours(0, 0, 0, 0);
+      const spacesOut: OverviewSpaceRow[] = spaces.map((s) => {
+        const rows = tasks.filter((t) => t.space_id === s.id);
         const active = rows.filter((t) => t.status?.category === 'Active' || t.status?.category === 'Not Started').length;
-        const blocked = rows.filter((t) => t.is_blocked).length;
+        const blocked = rows.filter((t) => t.is_blocked && t.status?.category !== 'Done' && t.status?.category !== 'Cancelled').length;
         const overdue = rows.filter((t) => t.due_date && new Date(t.due_date) < today && t.status?.category !== 'Done' && t.status?.category !== 'Cancelled').length;
         const doneMonth = rows.filter((t) => t.completed_at && new Date(t.completed_at) >= start).length;
-        out.push({ ...s, active, blocked, overdue, doneMonth });
-      }
-      return out;
+        const mine = rows.filter((t) => t.assignee_id === uid && t.status?.category !== 'Done' && t.status?.category !== 'Cancelled').length;
+        const weekEnd = new Date(today); weekEnd.setDate(weekEnd.getDate() + 7);
+        const dueSoon = rows.filter((t) => {
+          if (!t.due_date || t.status?.category === 'Done' || t.status?.category === 'Cancelled') return false;
+          const d = new Date(t.due_date); d.setHours(0, 0, 0, 0);
+          return d >= today && d <= weekEnd;
+        }).length;
+        const unassigned = rows.filter((t) => !t.assignee_id && t.status?.category !== 'Done' && t.status?.category !== 'Cancelled').length;
+        return { ...s, active, blocked, overdue, doneMonth, mine, dueSoon, unassigned };
+      });
+      return { uid, spaces: spacesOut, tasks };
     },
   });
 }

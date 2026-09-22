@@ -5,35 +5,11 @@ import { inviteSchema } from '../../lib/schemas';
 import { useMembers, useMyRole } from '../spaces/hooks';
 import { useRevokeInvitation, useInviteUser, useSpaceInvitations } from './hooks';
 import { useAuth } from '../../lib/auth';
-import { Button, Empty, ErrorBox, Field, Input, Loading, Select } from '../../components/ui';
+import { Button, Field, Input, Loading, Select } from '../../components/ui';
 import { CheckIcon, CloseIcon, SendIcon, TrashIcon } from '../../components/icons';
 import { can } from '../../lib/utils';
 
-export function InvitationsPage() {
-  return (
-    <div>
-      <MyInvitations />
-    </div>
-  );
-}
-
-export function MyInvitations() {
-  const { data, isLoading, error, refetch } = useMyInvitationsList();
-  if (isLoading) return <Loading />;
-  if (error) return <ErrorBox message={(error as Error).message} onRetry={() => refetch()} />;
-  return (
-    <div>
-      <h1 className="text-lg font-semibold">Invitations</h1>
-      <p className="text-sm text-muted">Spaces you have been invited to. Accept or decline.</p>
-      <div className="mt-3">
-        {!data?.length ? <Empty title="No pending invitations" /> : <InvitationList rows={data} />}
-      </div>
-    </div>
-  );
-}
-
-// re-export hooks with local names to avoid circular import confusion
-import { useMyInvitations as useMyInvitationsList, useRespondInvitation } from './hooks';
+import { useRespondInvitation } from './hooks';
 
 export function InvitationList({ rows }: { rows: import('../../lib/database.types').Invitation[] }) {
   const respond = useRespondInvitation();
@@ -50,22 +26,24 @@ export function InvitationList({ rows }: { rows: import('../../lib/database.type
               <td>{r.role}</td>
               <td className="text-muted">{r.inviter?.display_name ?? '—'}</td>
               <td className="text-muted">{new Date(r.created_at).toLocaleDateString()}</td>
-              <td className="whitespace-nowrap">
-                <Button
-                  variant="primary" className="mr-2"
-                  disabled={respond.isPending}
-                  icon={<CheckIcon className="h-4 w-4" />}
-                  onClick={() => respond.mutateAsync({ id: r.id, accept: true }).catch((e) => setErr((e as Error).message))}
-                >
-                  Accept
-                </Button>
-                <Button
-                  disabled={respond.isPending}
-                  icon={<CloseIcon className="h-4 w-4" />}
-                  onClick={() => respond.mutateAsync({ id: r.id, accept: false }).catch((e) => setErr((e as Error).message))}
-                >
-                  Decline
-                </Button>
+              <td>
+                <span className="flex gap-2 flex-wrap">
+                  <Button
+                    variant="primary"
+                    disabled={respond.isPending}
+                    icon={<CheckIcon className="h-4 w-4" />}
+                    onClick={() => respond.mutateAsync({ id: r.id, accept: true }).catch((e) => setErr((e as Error).message))}
+                  >
+                    Accept
+                  </Button>
+                  <Button
+                    disabled={respond.isPending}
+                    icon={<CloseIcon className="h-4 w-4" />}
+                    onClick={() => respond.mutateAsync({ id: r.id, accept: false }).catch((e) => setErr((e as Error).message))}
+                  >
+                    Decline
+                  </Button>
+                </span>
               </td>
             </tr>
           ))}
@@ -95,7 +73,7 @@ export function SpaceInvitePanel({ spaceId }: { spaceId: string }) {
   return (
     <div className="card p-4 mt-3">
       <h2 className="text-sm font-semibold">Invite by email</h2>
-      <p className="text-xs text-muted">No email is sent. The recipient sees it under Invitations. {role !== 'owner' && 'Leads cannot invite owners or leads.'}</p>
+      <p className="text-xs text-muted">No email is sent. The recipient sees it under Profile → Invitations. {role !== 'owner' && 'Leads cannot invite owners or leads.'}</p>
       <form
         className="mt-2 flex flex-col sm:flex-row gap-2"
         onSubmit={handleSubmit(async (v) => {

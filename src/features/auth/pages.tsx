@@ -302,7 +302,7 @@ export function RegisterPage() {
             What happens after
           </h3>
           <ol className="mt-2 space-y-1.5 text-sm text-muted list-decimal list-inside">
-            <li>You land on Overview. Create a space, or open Invitations if a teammate invited this email.</li>
+            <li>You land on Overview. Create a space, or open Profile → Invitations if a teammate invited this email.</li>
             <li>If email confirmation is on, verify from your inbox first, then log in.</li>
           </ol>
         </div>

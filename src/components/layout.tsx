@@ -88,10 +88,9 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
       <NavLink to="/spaces" className={linkCls} onClick={onNavigate}>
         Spaces{activeSpaceCount ? ` (${activeSpaceCount})` : ''}
       </NavLink>
-      <NavLink to="/invitations" className={linkCls} onClick={onNavigate}>
-        Invitations{inviteCount ? ` (${inviteCount})` : ''}
+      <NavLink to="/profile" className={linkCls} onClick={onNavigate}>
+        Profile{inviteCount ? ` (${inviteCount})` : ''}
       </NavLink>
-      <NavLink to="/account" className={linkCls} onClick={onNavigate}>Account</NavLink>
     </nav>
   );
 

@@ -16,9 +16,9 @@ const steps = [
   },
   {
     title: 'Invite by email',
-    body: 'Owners and leads invite from the Members page. Nothing is sent by email — the invite waits under Invitations until the recipient accepts. Leads can invite members and viewers; only owners can invite leads and owners.',
-    to: '/invitations',
-    linkLabel: 'Go to Invitations',
+    body: 'Owners and leads invite from the Members page. Nothing is sent by email — the invite waits under Profile → Invitations until the recipient accepts. Leads can invite members and viewers; only owners can invite leads and owners.',
+    to: '/profile#invitations',
+    linkLabel: 'Go to Profile → Invitations',
   },
   {
     title: 'Add and assign tasks',
@@ -121,9 +121,9 @@ export function SystemOverviewContent({ onNavigate }: { onNavigate?: () => void 
         </h3>
         <ul className="mt-2 space-y-1.5 text-sm">
           <li><Link to="/spaces" className="no-underline font-medium" onClick={onNavigate}>Create your first space</Link> <span className="text-muted">— name, prefix, timezone.</span></li>
-          <li><Link to="/invitations" className="no-underline font-medium" onClick={onNavigate}>Check invitations</Link> <span className="text-muted">— accept a space someone shared with this email.</span></li>
+          <li><Link to="/profile#invitations" className="no-underline font-medium" onClick={onNavigate}>Check invitations</Link> <span className="text-muted">— accept a space someone shared with this email.</span></li>
           <li><Link to="/my-tasks" className="no-underline font-medium" onClick={onNavigate}>Open My Tasks</Link> <span className="text-muted">— work assigned to you across spaces.</span></li>
-          <li><Link to="/account" className="no-underline font-medium" onClick={onNavigate}>Review your account</Link> <span className="text-muted">— display name shown to teammates.</span></li>
+          <li><Link to="/profile" className="no-underline font-medium" onClick={onNavigate}>Review your profile</Link> <span className="text-muted">— display name shown to teammates.</span></li>
         </ul>
       </section>
     </div>

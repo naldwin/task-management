@@ -10,7 +10,6 @@ import { SpaceTasksPage } from './features/tasks/list';
 import { TaskDetailPage } from './features/tasks/detail';
 import { SpaceMembersPage, SpaceSettingsPage } from './features/spaces/manage';
 import { SpaceReportDetailPage, SpaceReportsPage } from './features/reports/pages';
-import { InvitationsPage } from './features/invitations/pages';
 import { AccountPage } from './features/settings/account';
 
 function Protected() {
@@ -43,7 +42,7 @@ export default function App() {
         <Route path="/" element={<Navigate to="/overview" replace />} />
         <Route path="/overview" element={<OverviewPage />} />
         <Route path="/my-tasks" element={<MyTasksPage />} />
-        <Route path="/invitations" element={<InvitationsPage />} />
+        <Route path="/profile" element={<AccountPage />} />
         <Route path="/spaces" element={<SpacesPage />} />
         <Route path="/spaces/:spaceId/tasks" element={<SpaceTasksPage />} />
         <Route path="/spaces/:spaceId/tasks/:taskId" element={<TaskDetailPage />} />
@@ -51,7 +50,7 @@ export default function App() {
         <Route path="/spaces/:spaceId/settings" element={<SpaceSettingsPage />} />
         <Route path="/spaces/:spaceId/reports" element={<SpaceReportsPage />} />
         <Route path="/spaces/:spaceId/reports/:month" element={<SpaceReportDetailPage />} />
-        <Route path="/account" element={<AccountPage />} />
+        <Route path="/account" element={<Navigate to="/profile" replace />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>
