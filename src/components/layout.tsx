@@ -114,8 +114,8 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
 
       {/* desktop sidebar */}
       <aside className="no-print hidden md:flex w-56 shrink-0 self-start flex-col border-r border-charcoal-700 bg-charcoal-900 md:sticky md:top-0 md:h-dvh">
-        <div className="px-3 py-3 border-b border-charcoal-700 shrink-0">
-          <div className="flex items-center justify-between gap-2 -mt-3">
+        <div className="px-3 py- border-b border-charcoal-700 shrink-0">
+          <div className="flex items-center justify-between gap-2">
             <WorkloggerLogo className="h-12 w-auto" />
             <HelpButton onClick={() => setHelpOpen(true)} />
           </div>
