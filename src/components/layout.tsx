@@ -147,7 +147,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <div className="min-h-dvh md:flex md:items-start">
       <Sidebar onNavigate={() => setMobileNav(false)} />
       <main className="flex-1 min-w-0">
-        <div className="mx-auto max-w-6xl px-3 py-4 md:px-6" data-mobile-nav={mobileNav}>
+        <div className="mx-auto max-w-6xl px-6 md:py-8 py-5" data-mobile-nav={mobileNav}>
           {children}
         </div>
       </main>
